@@ -1,0 +1,35 @@
+#include "stm32f7xx_hal.h"
+
+static void SystemClock_Config(void);
+static void MX_GPIO_Init(void);
+static void spin_delay(volatile uint32_t c){ while(c--) __NOP(); }
+
+int main(void){
+  HAL_Init();
+  SystemClock_Config();
+  MX_GPIO_Init();
+
+  for(;;){
+    HAL_GPIO_TogglePin(GPIOI, GPIO_PIN_1);
+    spin_delay(12*1000*100);
+  }
+}
+
+static void SystemClock_Config(void){
+  RCC_OscInitTypeDef o={0}; RCC_ClkInitTypeDef c={0};
+  o.OscillatorType=RCC_OSCILLATORTYPE_HSI; o.HSIState=RCC_HSI_ON;
+  o.HSICalibrationValue=RCC_HSICALIBRATION_DEFAULT; o.PLL.PLLState=RCC_PLL_NONE;
+  HAL_RCC_OscConfig(&o);
+  c.ClockType=RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK|RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
+  c.SYSCLKSource=RCC_SYSCLKSOURCE_HSI; c.AHBCLKDivider=RCC_SYSCLK_DIV1;
+  c.APB1CLKDivider=RCC_HCLK_DIV1; c.APB2CLKDivider=RCC_HCLK_DIV1;
+  HAL_RCC_ClockConfig(&c, FLASH_LATENCY_0);
+}
+
+static void MX_GPIO_Init(void){
+  __HAL_RCC_GPIOI_CLK_ENABLE();
+  GPIO_InitTypeDef g={0};
+  g.Pin=GPIO_PIN_1; g.Mode=GPIO_MODE_OUTPUT_PP; g.Pull=GPIO_NOPULL; g.Speed=GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOI,&g);
+  HAL_GPIO_WritePin(GPIOI, GPIO_PIN_1, GPIO_PIN_SET); // start OFF on active-LOW LED
+}

@@ -1,4 +1,7 @@
 # Setup to DHCP server to Connect to PI
+Using `dnsmasq` to setup a DHCP server. Make sure you specify the correct interface! You might also need to set an IP for you network card that is inside the network space. For the below example, the network is 192.168.4.1/24, so you may need to set up a static address inside this network. On Mac it looked something like this:
+<img width="472" height="547" alt="image" src="https://github.com/user-attachments/assets/d61af03d-2738-4784-a47b-f8afe0a4ad6f" />
+
 ```
 dnsmasq -d -i en13 -F 192.168.4.1,192.168.4.254
 ```

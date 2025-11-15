@@ -16,3 +16,13 @@ ffmpeg  -f v4l2  -input_format mjpeg -i /dev/video0 -preset ultrafast -tune zero
 ```
 ffplay -flags low_delay  -f mpegts -loglevel debug   -probesize 32 -analyzeduration 0 -tune zerolatency  -framedrop  -max_delay 0 -sync ext  'udp://192.168.4.1:42923'
 ```
+# Connecting to Internet
+```
+nmcli con add type wifi con-name "eduroam" ifname wlan0 ssid "eduroam" \
+  wifi-sec.key-mgmt wpa-eap 802-1x.eap peap \
+  802-1x.phase2-auth mschapv2 802-1x.identity "hyang175@ucsc.edu"
+```
+Then up the connection
+```
+nmcli connection up eduroam
+```

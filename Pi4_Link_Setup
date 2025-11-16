@@ -1,0 +1,40 @@
+# Conclusion
+# wifi (WPA2-Enterprise / eduroam) via wpa_supplicant.conf – not working
+# iPhone hotspot – not working
+# USB-C direct connect via config.txt/cmdline.txt – not working
+# HDMI keyboard/monitor setup – not available
+# solution: reset, assign static IP, use reliable Ethernet cable
+
+# Find the Pi or laptop IP
+arp -a
+
+# Stress test the link
+ping -D -s 1400 169.233.255.254
+
+# Watch link up/down events
+dmesg -w | egrep -i 'eth0: Link is (Up|Down)'
+
+# Windows ICS (Internet Connection Sharing)
+Win+R → ncpa.cpl
+Right-click Wi-Fi adapter → Properties
+Sharing tab:
+  [✓] Allow other network users to connect
+  Select: Ethernet
+OK
+Ethernet becomes: 192.168.137.1
+
+# Configure Static IP on Raspberry Pi (Headless)
+
+1. Insert SD card into laptop
+2. Open boot partition
+3. Edit: cmdline.txt
+4. One line only — add to the end:
+
+ip=192.168.137.5::192.168.137.1:255.255.255.0
+
+# Example final:
+console=serial0,115200 console=tty1 root=...rootwait quiet splash \
+ip=192.168.137.5::192.168.137.1:255.255.255.0
+
+# Reset SSH hostname entry after reinstall
+ssh-keygen -R raspberrypi.local

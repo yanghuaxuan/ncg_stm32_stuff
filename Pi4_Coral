@@ -1,0 +1,77 @@
+# Find Pi IP from Windows
+arp -a
+
+# SSH into the Pi
+ssh <username>@<pi-ip>
+
+# Test remote command
+ssh <username>@<pi-ip> "echo OK && uname -a"
+
+# Inline Python test on Pi
+python3 - << 'PY'
+print("Hello")
+PY
+
+ping raspberrypi.local
+arp -a
+ssh kwoc393@raspberrypi.local
+
+# Prereq
+uname -m
+ping -c 3 8.8.8.8
+
+# Miniforge
+cd ~
+wget https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Linux-aarch64.sh
+bash Miniforge3-Linux-aarch64.sh
+exec $SHELL
+
+# Environment
+cd ~
+nano tflite-py39.yml
+
+# tflite-py39.yml
+name: tflite-py39
+channels:
+  - conda-forge
+dependencies:
+  - python=3.9
+  - pip
+  - numpy
+  - pillow
+  - scipy
+  - opencv
+  - protobuf<4
+  - setuptools
+  - wheel
+
+conda env create -f tflite-py39.yml
+conda activate tflite-py39
+
+# Coral install
+pip install --extra-index-url https://google-coral.github.io/py-repo/ \
+    tflite-runtime==2.5.0.post1 pycoral
+
+# Save and Exit (Ctrl+O, Enter, Ctrl+X)
+
+# Install the Edge TPU runtime
+curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | gpg --dearmor | sudo tee /usr/share/keyrings/coral-archive-keyring.gpg > /dev/null
+
+echo "deb [signed-by=/usr/share/keyrings/coral-archive-keyring.gpg] https://packages.cloud.google.com/apt coral-edgetpu-stable main" | sudo tee /etc/apt/sources.list.d/coral-edgetpu.list
+
+sudo apt-get update
+sudo ldconfig
+
+# Reference
+# https://gweb-coral-full.uc.r.appspot.com/docs/accelerator/get-started/#requirements
+
+mkdir coral && cd coral
+git clone https://github.com/google-coral/pycoral.git
+
+cd pycoral
+bash examples/install_requirements.sh classify_image.py
+
+python3 examples/classify_image.py \
+--model test_data/mobilenet_v2_1.0_224_inat_bird_quant_edgetpu.tflite \
+--labels test_data/inat_bird_labels.txt \
+--input test_data/parrot.jpg

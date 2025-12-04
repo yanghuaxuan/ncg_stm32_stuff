@@ -12,7 +12,9 @@ Requires video_frame_iter.py, which should be provided in whereever you obtained
 """
 
 accelerator="CORAL"
-IMG_SZ=640
+video_path="test.mp4" # path your favorite video here. sizing is automatically handled by OpenCV
+IMG_SZ=320
+step=5
 
 if (accelerator == "CORAL"):
         #model_path = "yolov8n_no_nms_full_integer_quant.tflite"
@@ -37,9 +39,7 @@ output_details = interpreter.get_output_details()[0]
 input_index = input_details['index']
 output_index = output_details['index']
 
-video_path="test.mp4"
 # skip some frames we aren't forwarding effectively duplicate frames
-step=5
 video_dataset = video_frame_generator(video_path, step=5, resize=(IMG_SZ,IMG_SZ))
  
 latencies = []
